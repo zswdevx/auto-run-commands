@@ -1,0 +1,26 @@
+# Set default behavior to automatically normalize line endings to CRLF
+* text=auto eol=crlf
+
+# Explicitly declare text files that should always be normalized and converted to CRLF
+*.ts text eol=crlf
+*.js text eol=crlf
+*.json text eol=crlf
+*.md text eol=crlf
+*.yml text eol=crlf
+*.yaml text eol=crlf
+*.html text eol=crlf
+*.css text eol=crlf
+*.svg text eol=crlf
+*.txt text eol=crlf
+.gitignore text eol=crlf
+.gitattributes text eol=crlf
+.eslintrc* text eol=crlf
+.prettierrc* text eol=crlf
+*.vscodeignore text eol=crlf
+
+# Denote all files that are binary (should not be modified)
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.vsix binary

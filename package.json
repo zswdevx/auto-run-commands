@@ -1,0 +1,99 @@
+{
+  "name": "auto-run-commands",
+  "displayName": "Auto Run Commands",
+  "description": "Automatically runs commands when a project is opened.",
+  "version": "0.0.1",
+  "publisher": "zswdevx",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zswdevx/auto-run-commands.git"
+  },
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "autoRunCommands.configureCommands",
+        "title": "Configure Auto Run Commands"
+      }
+    ],
+    "configuration": {
+      "title": "Auto Run Commands",
+      "properties": {
+        "autoRunCommands.commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "An array of commands to run automatically when the workspace is opened."
+        },
+        "autoRunCommands.commandsWithConditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "Command to run in the terminal"
+              },
+              "condition": {
+                "type": "object",
+                "properties": {
+                  "fileExists": {
+                    "type": "string",
+                    "description": "Only run if this file exists (relative to workspace root)"
+                  },
+                  "packageScript": {
+                    "type": "string",
+                    "description": "Only run if package.json has this script"
+                  }
+                }
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "default": [],
+          "description": "An array of commands with conditions to run automatically when the workspace is opened."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "lint": "eslint src --ext ts,js",
+    "lint:fix": "eslint src --ext ts,js --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"**/*.js\" \"**/*.json\" \"!**/node_modules/**\" \"!out/**\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"**/*.js\" \"**/*.json\" \"!**/node_modules/**\" \"!out/**\"",
+    "publish": "pnpm run compile && pnpm dlx vsce publish",
+    "prepublish-checks": "pnpm run lint && pnpm run format:check && pnpm run compile && pnpm run package",
+    "version:patch": "pnpm version patch --no-git-tag-version && node ./scripts/update-changelog.js",
+    "version:minor": "pnpm version minor --no-git-tag-version && node ./scripts/update-changelog.js",
+    "version:major": "pnpm version major --no-git-tag-version && node ./scripts/update-changelog.js",
+    "version:prerelease": "pnpm version prerelease --preid=dev --no-git-tag-version && node ./scripts/update-changelog.js",
+    "version:prepatch": "pnpm version prepatch --preid=dev --no-git-tag-version && node ./scripts/update-changelog.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "@vscode/vsce": "^2.32.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "prettier": "^3.6.2",
+    "typescript": "^5.3.3"
+  }
+}
