@@ -50,22 +50,28 @@ export function activate(context: vscode.ExtensionContext) {
   // 处理新格式的命令（带条件）
 
   if (configInfo?.workspaceValue !== undefined) {
-    console.log('Auto Run Command: Found commands with conditions in workspace settings.')
+    console.log(
+      'Auto Run Commands for NPM Projects: Found commands with conditions in workspace settings.',
+    )
 
     commandsToRun = configInfo.workspaceValue
   } else if (configInfo?.globalValue !== undefined) {
-    console.log('Auto Run Command: Found commands with conditions in global user settings.')
+    console.log(
+      'Auto Run Commands for NPM Projects: Found commands with conditions in global user settings.',
+    )
 
     commandsToRun = configInfo.globalValue
   }
 
   // 如果没有找到新格式的命令，尝试处理旧格式的命令
   else if (legacyConfigInfo?.workspaceValue !== undefined) {
-    console.log('Auto Run Command: Found legacy commands in workspace settings.')
+    console.log('Auto Run Commands for NPM Projects: Found legacy commands in workspace settings.')
 
     commandsToRun = legacyConfigInfo.workspaceValue.map(cmd => ({ command: cmd }))
   } else if (legacyConfigInfo?.globalValue !== undefined) {
-    console.log('Auto Run Command: Found legacy commands in global user settings.')
+    console.log(
+      'Auto Run Commands for NPM Projects: Found legacy commands in global user settings.',
+    )
 
     commandsToRun = legacyConfigInfo.globalValue.map(cmd => ({ command: cmd }))
   }
@@ -74,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
     const workspaceFolders = vscode.workspace.workspaceFolders
 
     if (!workspaceFolders) {
-      console.log('Auto Run Command: No workspace folder found.')
+      console.log('Auto Run Commands for NPM Projects: No workspace folder found.')
 
       return
     }
@@ -93,7 +99,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (!fs.existsSync(filePath)) {
           console.log(
-            `Auto Run Command: Skipping command "${cmdConfig.command}" - required file not found: ${cmdConfig.condition.fileExists}`,
+            `Auto Run Commands for NPM Projects: Skipping command "${cmdConfig.command}" - required file not found: ${cmdConfig.condition.fileExists}`,
           )
 
           return false
@@ -107,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (!fs.existsSync(packageJsonPath)) {
           console.log(
-            `Auto Run Command: Skipping command "${cmdConfig.command}" - package.json not found`,
+            `Auto Run Commands for NPM Projects: Skipping command "${cmdConfig.command}" - package.json not found`,
           )
 
           return false
@@ -118,13 +124,13 @@ export function activate(context: vscode.ExtensionContext) {
 
           if (!packageJson.scripts || !packageJson.scripts[cmdConfig.condition.packageScript]) {
             console.log(
-              `Auto Run Command: Skipping command "${cmdConfig.command}" - script not found: ${cmdConfig.condition.packageScript}`,
+              `Auto Run Commands for NPM Projects: Skipping command "${cmdConfig.command}" - script not found: ${cmdConfig.condition.packageScript}`,
             )
 
             return false
           }
         } catch (error) {
-          console.error('Auto Run Command: Error parsing package.json', error)
+          console.error('Auto Run Commands for NPM Projects: Error parsing package.json', error)
 
           return false
         }
@@ -146,10 +152,12 @@ export function activate(context: vscode.ExtensionContext) {
         }
       })
     } else {
-      console.log('Auto Run Command: No valid commands to run after checking conditions.')
+      console.log(
+        'Auto Run Commands for NPM Projects: No valid commands to run after checking conditions.',
+      )
     }
   } else {
-    console.log('Auto Run Command: No commands to run.')
+    console.log('Auto Run Commands for NPM Projects: No commands to run.')
   }
 }
 
@@ -159,7 +167,7 @@ function showConfigurationNotification() {
   vscode.window
 
     .showInformationMessage(
-      'Auto Run Commands: Configure commands to run automatically when opening projects',
+      'Auto Run Commands for NPM Projects: Configure commands to run automatically when opening projects',
 
       'Open Settings',
     )

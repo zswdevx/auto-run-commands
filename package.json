@@ -1,6 +1,6 @@
 {
   "name": "auto-run-commands",
-  "displayName": "Auto Run Commands",
+  "displayName": "Auto Run Commands for NPM Projects",
   "description": "Automatically runs commands when a project is opened.",
   "version": "0.0.1",
   "publisher": "zswdevx",
@@ -24,7 +24,7 @@
       }
     ],
     "configuration": {
-      "title": "Auto Run Commands",
+      "title": "Auto Run Commands for NPM Projects",
       "properties": {
         "autoRunCommands.commands": {
           "type": "array",

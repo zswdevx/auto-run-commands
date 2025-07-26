@@ -1,6 +1,6 @@
 [Read this in Chinese (简体中文)](./README.md)
 
-# Auto Run Command
+# Auto Run Commands for NPM Projects
 
 This VS Code extension automatically runs predefined commands in the integrated terminal whenever you open a workspace. It's perfect for starting development servers, running build watchers, or any other repetitive setup task.
 

@@ -1,6 +1,6 @@
 # VS Code Extension Publishing Guide
 
-This document details the steps to manually publish the "Auto Run Commands" extension to the VS Code Marketplace.
+This document details the steps to manually publish the "Auto Run Commands for NPM Projects" extension to the VS Code Marketplace.
 
 ## Prerequisites
 

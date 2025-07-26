@@ -1,6 +1,6 @@
 # VS Code扩展发布流程指南
 
-本文档详细记录了如何手动发布"Auto Run Commands"扩展到VS Code Marketplace的步骤。
+本文档详细记录了如何手动发布"Auto Run Commands for NPM Projects"扩展到VS Code Marketplace的步骤。
 
 ## 前提条件
 

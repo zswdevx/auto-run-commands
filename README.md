@@ -1,6 +1,6 @@
 [View this in English](./README.en.md)
 
-# Auto Run Command 自动命令运行器
+# Auto Run Commands for NPM Projects 自动命令运行器
 
 这款 VS Code 插件可以在您打开工作区时，自动在集成终端中运行预设的命令。它非常适合用于启动开发服务器、运行构建观察程序或执行任何其他重复性的设置任务。
 
