@@ -1,182 +1,143 @@
 import * as vscode from 'vscode'
-
 import * as fs from 'fs'
-
 import * as path from 'path'
 
 interface CommandConfig {
   command: string
-
   condition?: {
     fileExists?: string
-
     packageScript?: string
   }
 }
 
+let outputChannel: vscode.OutputChannel
+function log(message: string) {
+  if (outputChannel) {
+    const timestamp = new Date().toLocaleTimeString()
+    outputChannel.appendLine(`[${timestamp}] ${message}`)
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
-  // 注册配置命令
+  outputChannel = vscode.window.createOutputChannel('Auto Run Commands for NPM Projects')
+  context.subscriptions.push(outputChannel)
+
+  log('Extension activated')
 
   const configureCommand = vscode.commands.registerCommand(
     'autoRunCommands.configureCommands',
-
     () => {
       vscode.commands.executeCommand('workbench.action.openSettings', 'autoRunCommands')
     },
   )
 
-  context.subscriptions.push(configureCommand)
+  const showLogsCommand = vscode.commands.registerCommand('autoRunCommands.showLogs', () => {
+    outputChannel.show()
+  })
 
-  // 如果是首次安装，显示配置通知
+  context.subscriptions.push(configureCommand, showLogsCommand)
 
   const hasShownNotification = context.globalState.get('autoRunCommands.hasShownNotification')
-
   if (!hasShownNotification) {
     showConfigurationNotification()
-
     context.globalState.update('autoRunCommands.hasShownNotification', true)
   }
-
   const config = vscode.workspace.getConfiguration('autoRunCommands')
-
-  const legacyConfigInfo = config.inspect<string[]>('commands')
-
+  const simpleConfigInfo = config.inspect<string[]>('commands')
   const configInfo = config.inspect<CommandConfig[]>('commandsWithConditions')
-
-  // 首先尝试获取新格式的命令配置
-
   let commandsToRun: CommandConfig[] = []
 
-  // 处理新格式的命令（带条件）
-
   if (configInfo?.workspaceValue !== undefined) {
-    console.log(
-      'Auto Run Commands for NPM Projects: Found commands with conditions in workspace settings.',
-    )
-
+    log('Found commands with conditions in workspace settings.')
     commandsToRun = configInfo.workspaceValue
   } else if (configInfo?.globalValue !== undefined) {
-    console.log(
-      'Auto Run Commands for NPM Projects: Found commands with conditions in global user settings.',
-    )
-
+    log('Found commands with conditions in global user settings.')
     commandsToRun = configInfo.globalValue
-  }
-
-  // 如果没有找到新格式的命令，尝试处理旧格式的命令
-  else if (legacyConfigInfo?.workspaceValue !== undefined) {
-    console.log('Auto Run Commands for NPM Projects: Found legacy commands in workspace settings.')
-
-    commandsToRun = legacyConfigInfo.workspaceValue.map(cmd => ({ command: cmd }))
-  } else if (legacyConfigInfo?.globalValue !== undefined) {
-    console.log(
-      'Auto Run Commands for NPM Projects: Found legacy commands in global user settings.',
-    )
-
-    commandsToRun = legacyConfigInfo.globalValue.map(cmd => ({ command: cmd }))
+  } else if (simpleConfigInfo?.workspaceValue !== undefined) {
+    log('Found simple commands in workspace settings.')
+    commandsToRun = simpleConfigInfo.workspaceValue.map(cmd => ({ command: cmd }))
+  } else if (simpleConfigInfo?.globalValue !== undefined) {
+    log('Found simple commands in global user settings.')
+    commandsToRun = simpleConfigInfo.globalValue.map(cmd => ({ command: cmd }))
   }
 
   if (commandsToRun.length > 0) {
     const workspaceFolders = vscode.workspace.workspaceFolders
-
     if (!workspaceFolders) {
-      console.log('Auto Run Commands for NPM Projects: No workspace folder found.')
-
+      log('No workspace folder found.')
       return
     }
-
     const rootPath = workspaceFolders[0].uri.fsPath
-
     const validCommands = commandsToRun.filter(cmdConfig => {
       if (!cmdConfig.condition) {
         return true // 没有条件的命令始终执行
       }
-
-      // 检查文件是否存在
-
       if (cmdConfig.condition.fileExists) {
         const filePath = path.join(rootPath, cmdConfig.condition.fileExists)
-
         if (!fs.existsSync(filePath)) {
-          console.log(
-            `Auto Run Commands for NPM Projects: Skipping command "${cmdConfig.command}" - required file not found: ${cmdConfig.condition.fileExists}`,
+          log(
+            `Skipping command "${cmdConfig.command}" - required file not found: ${cmdConfig.condition.fileExists}`,
           )
-
           return false
         }
       }
-
-      // 检查package.json中是否存在指定脚本
-
       if (cmdConfig.condition.packageScript) {
         const packageJsonPath = path.join(rootPath, 'package.json')
-
         if (!fs.existsSync(packageJsonPath)) {
-          console.log(
-            `Auto Run Commands for NPM Projects: Skipping command "${cmdConfig.command}" - package.json not found`,
-          )
-
+          log(`Skipping command "${cmdConfig.command}" - package.json not found`)
           return false
         }
-
         try {
           const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-
           if (!packageJson.scripts || !packageJson.scripts[cmdConfig.condition.packageScript]) {
-            console.log(
-              `Auto Run Commands for NPM Projects: Skipping command "${cmdConfig.command}" - script not found: ${cmdConfig.condition.packageScript}`,
+            log(
+              `Skipping command "${cmdConfig.command}" - script not found: ${cmdConfig.condition.packageScript}`,
             )
-
             return false
           }
         } catch (error) {
-          console.error('Auto Run Commands for NPM Projects: Error parsing package.json', error)
-
+          log(`Error parsing package.json: ${error}`)
           return false
         }
       }
-
       return true
     })
-
     if (validCommands.length > 0) {
+      log(`Running ${validCommands.length} command(s)`)
       validCommands.forEach(cmdConfig => {
         const command = cmdConfig.command
-
         if (typeof command === 'string' && command.trim() !== '') {
+          log(`Executing command: ${command}`)
           const terminal = vscode.window.createTerminal()
-
           terminal.sendText(command)
-
           terminal.show()
         }
       })
     } else {
-      console.log(
-        'Auto Run Commands for NPM Projects: No valid commands to run after checking conditions.',
-      )
+      log('No valid commands to run after checking conditions.')
     }
   } else {
-    console.log('Auto Run Commands for NPM Projects: No commands to run.')
+    log('No commands to run.')
   }
 }
-
-// 显示提示用户配置扩展的通知
-
 function showConfigurationNotification() {
   vscode.window
-
     .showInformationMessage(
       'Auto Run Commands for NPM Projects: Configure commands to run automatically when opening projects',
-
       'Open Settings',
+      'Show Logs',
     )
-
     .then(selection => {
       if (selection === 'Open Settings') {
         vscode.commands.executeCommand('workbench.action.openSettings', 'autoRunCommands')
+      } else if (selection === 'Show Logs') {
+        outputChannel.show()
       }
     })
 }
-
-export function deactivate() {}
+export function deactivate() {
+  if (outputChannel) {
+    log('Extension deactivated')
+    outputChannel.dispose()
+  }
+}

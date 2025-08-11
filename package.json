@@ -21,6 +21,10 @@
       {
         "command": "autoRunCommands.configureCommands",
         "title": "Configure Auto Run Commands"
+      },
+      {
+        "command": "autoRunCommands.showLogs",
+        "title": "Show Auto Run Commands Logs"
       }
     ],
     "configuration": {
@@ -32,7 +36,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "An array of commands to run automatically when the workspace is opened."
+          "description": "Simple command mode: An array of commands to run automatically when the workspace is opened. These commands will execute unconditionally in all workspaces."
         },
         "autoRunCommands.commandsWithConditions": {
           "type": "array",
@@ -62,7 +66,7 @@
             ]
           },
           "default": [],
-          "description": "An array of commands with conditions to run automatically when the workspace is opened."
+          "description": "Advanced command mode: An array of commands with conditions to run automatically when the workspace is opened. These commands support conditional execution based on file existence or package.json scripts."
         }
       }
     }
