@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2025-08-11
+
 ## [0.0.1] - 2025-07-25
 - Smart conditional execution feature, allowing commands to run only when specific files exist or package.json scripts are present
 - First-time installation guidance notification

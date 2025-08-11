@@ -107,8 +107,20 @@ export function activate(context: vscode.ExtensionContext) {
       validCommands.forEach(cmdConfig => {
         const command = cmdConfig.command
         if (typeof command === 'string' && command.trim() !== '') {
+          const terminalName = `Auto Run: ${command.length > 30 ? command.substring(0, 30) + '...' : command}`
+
+          // 检查是否已经有同名的活跃终端
+          const existingTerminal = vscode.window.terminals.find(
+            terminal => terminal.name === terminalName && terminal.exitStatus === undefined,
+          )
+
+          if (existingTerminal) {
+            log(`Skipping command "${command}" - terminal already running: ${terminalName}`)
+            return
+          }
+
           log(`Executing command: ${command}`)
-          const terminal = vscode.window.createTerminal()
+          const terminal = vscode.window.createTerminal(terminalName)
           terminal.sendText(command)
           terminal.show()
         }
